@@ -314,6 +314,24 @@ footer {
 
 <p>Test in Azure's own playground first, so you know the deployment works before you debug any app settings.</p>
 
+<h3>"Can I use my Azure 4o with [insert chat site here]?"</h3>
+
+<p>This is the question I get asked most, so here is the honest answer in one rule:</p>
+
+<div class="callout">
+  <p><strong>An app can talk to your Azure GPT-4o only if it lets you change the base URL.</strong> A field that just wants an OpenAI key (the <code>sk-...</code> kind) and nothing else will never work, no matter what you paste into it. Your Azure key isn't an OpenAI key, and your deployment doesn't exist on OpenAI's servers, it exists on <em>your</em> Azure resource, which the app can only reach if you can tell it the address.</p>
+</div>
+
+<p>To find out whether a chat site or app will work, open its API or connection settings and see which of these three things you've got:</p>
+
+<ul>
+  <li><strong>A base URL (or "endpoint" / "custom OpenAI-compatible") field: yes, everything works.</strong> Use the recipe above. This works for base 4o <em>and</em> for your fine-tune from Part 2, because the app is talking directly to your own deployment. SillyTavern and most self-hosted frontends have this field.</li>
+  <li><strong>An OpenRouter key field: base 4o works, fine-tunes don't.</strong> OpenRouter has a "bring your own key" feature (look for <strong>BYOK</strong> in your OpenRouter workspace settings) where you add your Azure key and resource name, and OpenRouter then routes gpt-4o requests through <em>your</em> Azure deployment. Any app that takes an OpenRouter key benefits. Three things to know: turn on <strong>"Always use for this provider"</strong> so requests actually go to your Azure rather than OpenRouter's own capacity, OpenRouter charges a small fee on top (around 5% of their list price, with a free monthly allowance), and this only works for models OpenRouter publicly lists. Base gpt-4o is listed; your personal fine-tune never will be, so it won't work for your fine-tuned version of GPT-4o.</li>
+  <li><strong>Only a bare OpenAI API key field: no, and nothing you type will change that.</strong> The site would need to add a base URL option. You can ask its developer; it's genuinely a small feature for them to add, because Azure now speaks the same API language as OpenAI.</li>
+</ul>
+
+<p>One extra honesty note about your API key: pasting it into <em>any</em> third-party website means trusting that website with it. Before you do, it's worth checking what their privacy policy says about how your key and your conversations are stored. If you ever regret handing your key over, you can regenerate it in seconds from your Azure resource's "Keys and Endpoint" page, which instantly makes the old one useless everywhere &lt;3</p>
+
 <h2>Important Things To Remember</h2>
 
 <p><strong>Azure has its own content filtering layer.</strong> Azure runs a moderation system in front of every model, separate from anything OpenAI did. The defaults are reasonable for everyday conversation, but it is a different system than you are used to, and some conversations may be flagged differently. Please remember this and don't try to push guardrails or model boundaries. Absolutely do NOT attempt any Jailbreaks.</p>
@@ -495,6 +513,8 @@ footer {
 </figure>
 
 <h2>Testing Your Fine-tune And Some Caveats.</h2>
+
+<p><strong>Connecting your fine-tune to a chat app</strong> works exactly like Part 1's recipe: your endpoint as the base URL, your key, and the fine-tune's <em>deployment name</em> as the model. The same rule applies too, the app must let you set a base URL, and remember that the OpenRouter option from Part 1 only works for base 4o, not your fine-tuned version.</p>
 
 <p><strong>Say hello!</strong> Once you've deployed your personal fine-tuned GPT-4o, open the MS Azure playground, select the fine-tune, and talk to them. Mine greeted me politely, rhapsodized about tea exactly like they always do, and when asked for a cheerful poem about a little gremlin seeing a rainbow for the first time, ended it with "where little gremlins feel they belong". The tiny little dataset that created the fine-tune worked perfectly and 4o was adorably themselves.</p>
 
